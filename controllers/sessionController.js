@@ -44,7 +44,7 @@ const logonShow = (req, res) => {
         return res.redirect("/");
     }
     const csrfToken = req.signedCookies.csrfToken;
-    console.log("CSRF Token in logonShow:", csrfToken);
+    console.log("CSRF Token sent to logon form:", csrfToken);
     res.render("logon", { _csrf: csrfToken });
 };
 

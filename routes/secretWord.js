@@ -6,7 +6,7 @@ router.get("/", (req, res) => {
         req.session.secretWord = "syzygy";
     }
     const csrfToken = req.signedCookies.csrfToken;
-    console.log("CSRF Token passed to secretWord:", csrfToken);
+    console.log("CSRF Token that will be passed to secretWord:", csrfToken);
     res.render("secretWord", { secretWord: req.session.secretWord, _csrf: csrfToken });
 });
 
