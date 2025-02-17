@@ -1,7 +1,6 @@
 const express = require("express");
 const passport = require("passport");
 const router = express.Router();
-
 const {
   logonShow,
   registerShow,
@@ -22,5 +21,4 @@ router
   );
 
 router.route("/logoff").post(logoff);
-
 module.exports = router;

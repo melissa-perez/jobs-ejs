@@ -1,6 +1,10 @@
 const express = require("express");
 require("express-async-errors");
-
+const helmet = require("helmet");
+const xss = require("xss-clean");
+const rateLimiter = require("express-rate-limit");
+const csrf = require("host-csrf");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 app.set("view engine", "ejs");
@@ -33,7 +37,28 @@ if (app.get("env") === "production") {
     sessionParms.cookie.secure = true; // serve secure cookies
 }
 
+app.use(rateLimiter({
+    windowsMs: 15 * 60 * 1000,
+    max: 100
+}));
+app.use(express.json());
+app.use(helmet());
+app.use(xss());
 app.use(session(sessionParms));
+app.use(cookieParser(process.env.SESSION_SECRET));
+
+const csrfOptions = {
+    protected_operations: ['POST'],
+    protected_content_types: [
+        'application/json',
+        'application/x-www-form-urlencoded'
+    ],
+    development_mode: app.get("env") === "development"
+};
+
+const csrfMiddleware = csrf(csrfOptions);
+
+app.use(csrfMiddleware);
 
 const passport = require("passport");
 const passportInit = require("./passport/passportInit");
@@ -45,13 +70,15 @@ app.use(require("connect-flash")());
 
 app.use(require("./middleware/storeLocals"));
 app.get("/", (req, res) => {
-    res.render("index");
+    const csrfToken = req.signedCookies.csrfToken;
+    console.log("CSRF Token in //:", csrfToken);
+    res.render("index", { csrfToken: csrfToken });
 });
 app.use("/sessions", require("./routes/sessionRoutes"));
 
 const secretWordRouter = require("./routes/secretWord");
 const auth = require("./middleware/auth");
-app.use("/secretWord", auth, secretWordRouter);
+app.use("/secretWord", csrfMiddleware, auth, secretWordRouter);
 
 app.use((req, res) => {
     res.status(404).send(`That page (${req.url}) was not found.`);

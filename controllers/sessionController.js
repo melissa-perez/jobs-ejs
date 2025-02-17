@@ -6,6 +6,8 @@ const registerShow = (req, res) => {
 };
 
 const registerDo = async (req, res, next) => {
+    const csrfToken = req.signedCookies.csrfToken;
+    console.log("CSRF Token in register:", csrfToken);
     if (req.body.password != req.body.password1) {
         req.flash("error", "The passwords entered do not match.");
         return res.render("register", { errors: req.flash("error") });
@@ -26,19 +28,25 @@ const registerDo = async (req, res, next) => {
 };
 
 const logoff = (req, res) => {
-    req.session.destroy(function (err) {
+    req.session.destroy((err) => {
         if (err) {
-            console.log(err);
+            console.log("Error destroying session:", err);
+            return res.status(500).send("Error during logoff.");
         }
+
+        console.log("Session destroyed, redirecting to home.");
         res.redirect("/");
     });
 };
+
 
 const logonShow = (req, res) => {
     if (req.user) {
         return res.redirect("/");
     }
-    res.render("logon");
+    const csrfToken = req.signedCookies.csrfToken;
+    console.log("CSRF Token in logonShow:", csrfToken);
+    res.render("logon", { csrfToken: csrfToken });
 };
 
 module.exports = {
