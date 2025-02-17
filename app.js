@@ -9,7 +9,7 @@ const app = express();
 
 app.set("view engine", "ejs");
 app.use(require("body-parser").urlencoded({ extended: true }));
-require("dotenv").config(); // to load the .env file into the process.env object
+require("dotenv").config();
 
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
@@ -45,8 +45,9 @@ app.use(express.json());
 app.use(helmet());
 app.use(xss());
 app.use(session(sessionParms));
-app.use(cookieParser(process.env.SESSION_SECRET));
 
+// For CSRF
+app.use(cookieParser(process.env.SESSION_SECRET));
 const csrfOptions = {
     protected_operations: ['POST'],
     protected_content_types: [
@@ -55,11 +56,10 @@ const csrfOptions = {
     ],
     development_mode: app.get("env") === "development"
 };
-
 const csrfMiddleware = csrf(csrfOptions);
-
 app.use(csrfMiddleware);
 
+// For Passport
 const passport = require("passport");
 const passportInit = require("./passport/passportInit");
 passportInit();
@@ -67,18 +67,16 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 app.use(require("connect-flash")());
-
 app.use(require("./middleware/storeLocals"));
+
 app.get("/", (req, res) => {
-    const csrfToken = req.signedCookies.csrfToken;
-    console.log("CSRF Token in //:", csrfToken);
-    res.render("index", { csrfToken: csrfToken });
+    res.render("index");
 });
 app.use("/sessions", require("./routes/sessionRoutes"));
 
 const secretWordRouter = require("./routes/secretWord");
 const auth = require("./middleware/auth");
-app.use("/secretWord", csrfMiddleware, auth, secretWordRouter);
+app.use("/secretWord", auth, secretWordRouter);
 
 app.use((req, res) => {
     res.status(404).send(`That page (${req.url}) was not found.`);
