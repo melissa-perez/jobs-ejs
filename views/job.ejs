@@ -1,0 +1,19 @@
+<form action="<%= job ? `/job/update/${job.id}` : '/job' %>" method="POST">
+    <input type="hidden" name="_csrf" value="<%= _csrf %>">
+
+    <label for="company">Company:</label>
+    <input type="text" id="company" name="company" value="<%= job ? job.company : '' %>" required>
+
+    <label for="position">Position:</label>
+    <input type="text" id="position" name="position" value="<%= job ? job.position : '' %>" required>
+
+    <label for="status">Status:</label>
+    <select id="status" name="status">
+        <option value="Applied" <%= job && job.status === 'Applied' ? 'selected' : '' %>>Applied</option>
+        <option value="Interview" <%= job && job.status === 'Interview' ? 'selected' : '' %>>Interview</option>
+        <option value="Offer" <%= job && job.status === 'Offer' ? 'selected' : '' %>>Offer</option>
+        <option value="Rejected" <%= job && job.status === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+    </select>
+
+    <button type="submit"><%= job ? "Update Job" : "Add Job" %></button>
+</form>
