@@ -1,13 +1,6 @@
 const Job = require("../models/Job");
 const parseVErr = require("../util/parseValidationErr");
 
-
-/*const jobsShow = (req, res) =>{
-    const csrfToken = req.signedCookies.csrfToken;
-    console.log("CSRF Token sent to jobs form:", csrfToken);
-    res.render("register", { _csrf: csrfToken });
-}*/
-
 const getAllJobs = async (req, res) => {
     try {
         const csrfToken = req.signedCookies.csrfToken;
@@ -24,20 +17,55 @@ const getNewJobForm = (req, res) => {
     res.render("job", { job: null });
 };
 
-const createJob = (req, res) => {
-    res.send("create the job");
+const createJob = async (req, res) => {
+    try {
+        await Job.create({ ...req.body, createdBy: req.user._id });
+        res.redirect("/jobs");
+    } catch (error) {
+        console.log(error);
+        res.render("job", { errors: ["Failed to add job"] });
+    }
 };
 
-const getEditJobForm = (req, res) => {
-    //res.render("job", { job: null });
+const getEditJobForm = async (req, res) => {
+    try {
+        const job = await Job.findById(req.params.id);
+        if (!job || !job.createdBy.equals(req.user._id)) {
+            return res.redirect("/jobs");
+        }
+        res.render("job", { job });
+    } catch (error) {
+        console.log(error);
+        res.redirect("/jobs");
+    }
 };
 
 const updateJob = async (req, res) => {
-    res.send("edit job");
+    const job = await Job.findById(req.params.id);
+    if (!job || !job.createdBy.equals(req.user._id)) {
+        return res.redirect("/job");
+    }
+    try {
+        await Job.findByIdAndUpdate(req.params.id, req.body);
+        res.redirect("/jobs");
+    } catch (error) {
+        console.log(error);
+        res.render("job", { errors: ["Failed to add job"] });
+    }
 };
 
 const deleteJob = async (req, res) => {
-    res.send("delete job");
+    try {
+        const job = await Job.findById(req.params.id);
+        if (!job || !job.createdBy.equals(req.user._id)) {
+            return res.redirect("/jobs");
+        }
+        await Job.findByIdAndDelete(req.params.id);
+        res.redirect("/jobs");
+    } catch (error) {
+        console.log(error);
+        res.redirect("/jobs");
+    }
 };
 
 module.exports = {

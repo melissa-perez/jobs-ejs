@@ -15,6 +15,13 @@
             <td><%= job.company %></td>
             <td><%= job.position %></td>
             <td><%= job.status %></td>
+            <td><a href="/jobs/edit/<%= job._id %>">
+              <button type="button">edit</button>
+            </a></td>
+            <td> <form method="POST" action="/jobs/delete/<%= job._id %>" style="display: inline">
+              <button>delete</button>
+              <input type="hidden" name="_csrf" value="<%= _csrf %>" />
+            </form></td>
           </tr>
         <% }) %>
       <% } %>
