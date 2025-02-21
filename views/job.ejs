@@ -1,0 +1,25 @@
+<% if (messages.error) { %>
+    <div class="alert alert-danger"><%= messages.error %></div>
+<% } %>
+
+<% if (messages.success) { %>
+    <div class="alert alert-success"><%= messages.success %></div>
+<% } %>
+<form action="<%= job ? `/jobs/update/${job.id}` : '/jobs' %>" method="POST">
+    <input type="hidden" name="_csrf" value="<%= _csrf %>">
+
+    <label for="company">Company:</label>
+    <input type="text" id="company" name="company" value="<%= job ? job.company : '' %>" required>
+
+    <label for="position">Position:</label>
+    <input type="text" id="position" name="position" value="<%= job ? job.position : '' %>" required>
+
+    <label for="status">Status:</label>
+    <select id="status" name="status">
+        <option value="interview" <%= job && job.status === 'interview' ? 'selected' : '' %>>Interview</option>
+        <option value="declined" <%= job && job.status === 'declined' ? 'selected' : '' %>>Declined</option>
+        <option value="pending" <%= (job && job.status === 'pending') || !job ? 'selected' : '' %>>Pending</option>
+    </select>
+
+    <button type="submit"><%= job ? "Update Job" : "Add Job" %></button>
+</form>

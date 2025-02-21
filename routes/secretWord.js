@@ -5,8 +5,9 @@ router.get("/", (req, res) => {
     if (!req.session.secretWord) {
         req.session.secretWord = "syzygy";
     }
-
-    res.render("secretWord", { secretWord: req.session.secretWord });
+    const csrfToken = req.signedCookies.csrfToken;
+    console.log("CSRF Token that will be passed to secretWord:", csrfToken);
+    res.render("secretWord", { secretWord: req.session.secretWord, _csrf: csrfToken });
 });
 
 router.post("/", (req, res) => {

@@ -2,7 +2,9 @@ const User = require("../models/User");
 const parseVErr = require("../util/parseValidationErr");
 
 const registerShow = (req, res) => {
-    res.render("register");
+    const csrfToken = req.signedCookies.csrfToken;
+    console.log("CSRF Token sent to register form:", csrfToken);
+    res.render("register", { _csrf: csrfToken });
 };
 
 const registerDo = async (req, res, next) => {
@@ -26,19 +28,24 @@ const registerDo = async (req, res, next) => {
 };
 
 const logoff = (req, res) => {
-    req.session.destroy(function (err) {
+    req.session.destroy((err) => {
         if (err) {
-            console.log(err);
+            console.log("Error destroying session:", err);
+            return res.status(500).send("Error during logoff.");
         }
+        console.log("Session destroyed, redirecting to home.");
         res.redirect("/");
     });
 };
+
 
 const logonShow = (req, res) => {
     if (req.user) {
         return res.redirect("/");
     }
-    res.render("logon");
+    const csrfToken = req.signedCookies.csrfToken;
+    console.log("CSRF Token sent to logon form:", csrfToken);
+    res.render("logon", { _csrf: csrfToken });
 };
 
 module.exports = {
