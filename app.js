@@ -12,13 +12,17 @@ app.use(require("body-parser").urlencoded({ extended: true }));
 require("dotenv").config();
 const session = require("express-session");
 const MongoDBStore = require("connect-mongodb-session")(session);
-const url = process.env.MONGO_URI;
+let mongoURL = process.env.MONGO_URI;
+if (process.env.NODE_ENV == "test") {
+    mongoURL = process.env.MONGO_URI_TEST;
+}
+
 
 const jobs = require("./routes/jobs");
 
 const store = new MongoDBStore({
     // may throw an error, which won't be caught
-    uri: url,
+    uri: mongoURL,
     collection: "mySessions",
 });
 store.on("error", function (error) {
