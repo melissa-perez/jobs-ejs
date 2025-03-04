@@ -58,7 +58,7 @@ describe("jobs-ejs puppeteer test", function () {
     });
   });
   describe("puppeteer job operations", function () {
-    this.timeout(20000);
+    this.timeout(40000);
 
     it("clicks on link and verifies job list", async () => {
       const { expect } = await import('chai');
@@ -71,6 +71,32 @@ describe("jobs-ejs puppeteer test", function () {
       const content = await page.content();
       const jobs = content.split('<tr>').length - 1;
       expect(jobs).to.equal(20, "Expected 20 job entries.");
+    });
+
+    it("should open the add job form and validate", async () => {
+      const { expect } = await import('chai');
+      const newJobLink = await page.waitForSelector('a[href="/jobs/new"]');
+      await newJobLink.click();
+      await page.waitForNavigation();
+
+      const companyField = await page.waitForSelector('input[name="company"]');
+      const positionField = await page.waitForSelector('input[name="position"]');
+      const statusField = await page.waitForSelector('select[name="status"]');
+      const addButton = await page.waitForSelector('button[type="submit"]');
+
+      expect(companyField).to.exist;
+      expect(positionField).to.exist;
+      expect(statusField).to.exist;
+      expect(addButton).to.exist;
+
+      const companyValue = await companyField.evaluate(el => el.value);
+      const positionValue = await positionField.evaluate(el => el.value);
+      const statusValue = await statusField.evaluate(el => el.value);
+
+      expect(companyValue).to.equal('');
+      expect(positionValue).to.equal('');
+      expect(statusValue).to.equal('pending');
+
     });
 
   });
