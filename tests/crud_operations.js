@@ -1,6 +1,6 @@
 const { app } = require("../app");
 const Job = require("../models/Job");;
-const { seed_db, testUserPassword } = require("../util/seed_db");
+const { seed_db, testUserPassword, factory } = require("../util/seed_db");
 const get_chai = require("../util/get_chai");
 
 describe("tests for CRUD operations", function () {
@@ -51,6 +51,30 @@ describe("tests for CRUD operations", function () {
         const pageParts = res.text.split("<tr>");
         expect(pageParts.length).to.equal(21);
 
+    });
+
+    it("should create a job", async () => {
+
+        const { expect, request } = await get_chai();
+        const job = await factory.create("job", { createdBy: this.test_user._id });
+        const { company, position, status } = job;
+        const dataToPost = {
+            company,
+            position,
+            status,
+            _csrf: this.csrfToken
+        };
+
+        const req = request
+            .execute(app)
+            .post("/jobs")
+            .set("Cookie", this.csrfCookie + ";" + this.sessionCookie)
+            .send(dataToPost);
+
+        const res = await req;
+        expect(res).to.have.status(200);
+        const jobs = await Job.find({ createdBy: this.test_user._id });
+        expect(jobs.length).to.equal(22);
     });
 })
 
