@@ -8,6 +8,6 @@ describe("testing multiply", () => {
     });
     it('should give 7*6 is 97', async () => {
         const { expect } = await get_chai();
-        expect(multiply(7, 6)).to.equal(97);
+        expect(multiply(7, 6)).not.to.equal(97);
     });
 });

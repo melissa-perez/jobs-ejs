@@ -98,7 +98,32 @@ describe("jobs-ejs puppeteer test", function () {
       expect(statusValue).to.equal('pending');
 
     });
+    it("fill out the form and add job", async () => {
+      const { expect } = await import('chai');
 
+      const companyField = await page.waitForSelector('input[name="company"]',);
+      const positionField = await page.waitForSelector('input[name="position"]');
+      const statusField = await page.waitForSelector('select[name="status"]');
+      const addButton = await page.waitForSelector('button[type="submit"]');
+
+      const companyName = "Company";
+      const positionName = "Position";
+      const statusName = "interview";
+
+      await companyField.type(companyName);
+      await positionField.type(positionName);
+      await statusField.type(statusName);
+
+      await addButton.click();
+      await page.waitForNavigation();
+
+      const lastJob = await Job.findOne({}).sort({ createdAt: -1 }).exec();
+      expect(lastJob).to.exist;
+      expect(lastJob.company).to.equal(companyName);
+      expect(lastJob.position).to.equal(positionName);
+      expect(lastJob.status).to.equal(statusName);
+
+    });
   });
 
 });
