@@ -2,6 +2,7 @@ const puppeteer = require("puppeteer");
 require("../app");
 const { seed_db, testUserPassword } = require("../util/seed_db");
 const Job = require("../models/Job");
+
 let testUser = null;
 
 let page = null;
@@ -20,7 +21,7 @@ describe("jobs-ejs puppeteer test", function () {
     await browser.close();
   });
   describe("got to site", function () {
-    it("should have completed a connection", async function () {});
+    it("should have completed a connection", async function () { });
   });
   describe("index page test", function () {
     this.timeout(10000);
@@ -56,4 +57,22 @@ describe("jobs-ejs puppeteer test", function () {
       console.log("copyright text: ", copyrText);
     });
   });
+  describe("puppeteer job operations", function () {
+    this.timeout(20000);
+
+    it("clicks on link and verifies job list", async () => {
+      const { expect } = await import('chai');
+      this.jobsLink = await page.waitForSelector(
+        "a ::-p-text(Click this link to view your jobs list.)",
+      );
+      await this.jobsLink.click();
+      await page.waitForNavigation();
+
+      const content = await page.content();
+      const jobs = content.split('<tr>').length - 1;
+      expect(jobs).to.equal(20, "Expected 20 job entries.");
+    });
+
+  });
+
 });

@@ -25,7 +25,7 @@ describe("tests for registration and logon", function () {
         expect(res.headers).to.have.property("set-cookie");
         const cookies = res.headers["set-cookie"];
         this.csrfCookie = cookies.find((element) =>
-            element.startsWith("__Host-csrfToken"),
+            element.startsWith("csrfToken"),
         );
 
         expect(this.csrfCookie).to.not.be.undefined;

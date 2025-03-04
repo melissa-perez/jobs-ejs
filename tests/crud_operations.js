@@ -13,7 +13,7 @@ describe("tests for CRUD operations", function () {
         this.csrfToken = /_csrf\" value=\"(.*?)\"/.exec(textNoLineEnd)[1];
         let cookies = res.headers["set-cookie"];
         this.csrfCookie = cookies.find((element) =>
-            element.startsWith("__Host-csrfToken"),
+            element.startsWith("csrfToken"),
         );
         const dataToPost = {
             email: this.test_user.email,
@@ -49,14 +49,14 @@ describe("tests for CRUD operations", function () {
         const res = await req;
         expect(res).to.have.status(200);
         const pageParts = res.text.split("<tr>");
-        expect(pageParts.length).to.equal(21);
+        expect(pageParts.length - 1).to.equal(20);
 
     });
 
     it("should create a job", async () => {
 
         const { expect, request } = await get_chai();
-        const job = await factory.create("job", { createdBy: this.test_user._id });
+        const job = await factory.build("job", { createdBy: this.test_user._id });
         const { company, position, status } = job;
         const dataToPost = {
             company,
@@ -65,16 +65,19 @@ describe("tests for CRUD operations", function () {
             _csrf: this.csrfToken
         };
 
+        expect(this.sessionCookie).to.not.be.undefined;
+
         const req = request
             .execute(app)
             .post("/jobs")
             .set("Cookie", this.csrfCookie + ";" + this.sessionCookie)
+            .set("Content-Type", "application/x-www-form-urlencoded")
+            .redirects(0)
             .send(dataToPost);
-
         const res = await req;
-        expect(res).to.have.status(200);
+        expect(res).to.have.status(302);
         const jobs = await Job.find({ createdBy: this.test_user._id });
-        expect(jobs.length).to.equal(22);
+        expect(jobs.length).to.equal(21);
     });
 })
 

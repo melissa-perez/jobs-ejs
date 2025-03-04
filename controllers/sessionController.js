@@ -3,7 +3,7 @@ const parseVErr = require("../util/parseValidationErr");
 
 const registerShow = (req, res) => {
     const csrfToken = res.locals._csrf;
-    console.log("CSRF Token sent to register form:", csrfToken);
+   // console.log("CSRF Token sent to register form:", csrfToken);
     res.render("register", { _csrf: csrfToken });
 };
 
@@ -44,7 +44,7 @@ const logonShow = (req, res) => {
         return res.redirect("/");
     }
     const csrfToken = res.locals._csrf;
-    console.log("CSRF Token sent to logon form:", csrfToken);
+   // console.log("CSRF Token sent to logon form:", csrfToken);
     res.render("logon", { _csrf: csrfToken });
 };
 
