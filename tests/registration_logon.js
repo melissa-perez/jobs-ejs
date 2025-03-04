@@ -100,11 +100,10 @@ describe("tests for registration and logon", function () {
         };
 
         const { expect, request } = await get_chai();
-
         const req = request
             .execute(app)
             .post("/sessions/logoff")
-            .set("Cookie", `${this.csrfCookie}; ${this.sessionCookie}`)
+            .set("Cookie", this.csrfCookie + ";" + this.sessionCookie)
             .set("content-type", "application/x-www-form-urlencoded")
             .send(dataToPost);
 
