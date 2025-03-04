@@ -3,7 +3,7 @@ const parseVErr = require("../util/parseValidationErr");
 
 const getAllJobs = async (req, res) => {
     try {
-        const csrfToken = req.signedCookies.csrfToken;
+        const csrfToken = res.locals._csrf;
         console.log("CSRF Token sent to jobs form:", csrfToken);
         const jobs = await Job.find({ createdBy: req.user._id }).sort("createdAt");
         res.render("jobs", { jobs, _csrf: csrfToken, messages: req.flash() });

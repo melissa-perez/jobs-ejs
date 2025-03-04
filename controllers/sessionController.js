@@ -2,7 +2,7 @@ const User = require("../models/User");
 const parseVErr = require("../util/parseValidationErr");
 
 const registerShow = (req, res) => {
-    const csrfToken = req.signedCookies.csrfToken;
+    const csrfToken = res.locals._csrf;
     console.log("CSRF Token sent to register form:", csrfToken);
     res.render("register", { _csrf: csrfToken });
 };
@@ -43,7 +43,7 @@ const logonShow = (req, res) => {
     if (req.user) {
         return res.redirect("/");
     }
-    const csrfToken = req.signedCookies.csrfToken;
+    const csrfToken = res.locals._csrf;
     console.log("CSRF Token sent to logon form:", csrfToken);
     res.render("logon", { _csrf: csrfToken });
 };

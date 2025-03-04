@@ -75,6 +75,15 @@ app.use(passport.session());
 app.use(require("connect-flash")());
 app.use(require("./middleware/storeLocals"));
 
+app.use((req, res, next) => {
+    if (req.path == "/multiply") {
+        res.set("Content-Type", "application/json");
+    } else {
+        res.set("Content-Type", "text/html");
+    }
+    next();
+});
+
 
 app.get("/", (req, res) => {
     res.render("index");
