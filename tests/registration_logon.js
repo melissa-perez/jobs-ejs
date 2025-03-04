@@ -94,5 +94,25 @@ describe("tests for registration and logon", function () {
         expect(res.text).to.include(this.user.name);
     });
 
+    it("should log the user off", async () => {
+        const dataToPost = {
+            _csrf: this.csrfToken,
+        };
+
+        const { expect, request } = await get_chai();
+
+        const req = request
+            .execute(app)
+            .post("/sessions/logoff")
+            .set("Cookie", `${this.csrfCookie}; ${this.sessionCookie}`)
+            .set("content-type", "application/x-www-form-urlencoded")
+            .send(dataToPost);
+
+        const res = await req;
+
+        expect(res).to.have.status(200);
+        expect(res.text).to.include("link to logon");
+    });
+
 });
 
